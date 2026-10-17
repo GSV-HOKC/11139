@@ -3,388 +3,1480 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Для Влады | Премиум</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Влада | Deluxe Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-  /* --- БАЗА --- */
-  * { margin:0; padding:0; box-sizing:border-box; }
-  
-  html { scroll-behavior: smooth; }
-  
-  body {
-    background: #0d0910;
-    color: #f4e9ef;
-    font-family: 'Montserrat', sans-serif;
-    overflow-x: hidden;
-    cursor: none; /* Скрываем стандартный курсор */
+  /* ==========================================================================
+     БАЗОВЫЕ СТИЛИ И ПЕРЕМЕННЫЕ
+     ========================================================================== */
+  :root {
+    --bg-dark: #0a070d;
+    --bg-deep: #120b16;
+    --accent: #ff8fb1;
+    --accent-glow: rgba(255, 143, 177, 0.4);
+    --text-main: #f4e9ef;
+    --text-muted: #a89ba4;
+    --gold: #e8c87a;
+    --font-serif: 'Cormorant Garamond', serif;
+    --font-display: 'Playfair Display', serif;
+    --font-sans: 'Montserrat', sans-serif;
+    --transition: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* --- КАСТОМНЫЙ КУРСОР --- */
-  .cursor {
-    width: 8px; height: 8px;
-    background: #ff8fb1;
-    border-radius: 50%;
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--bg-dark);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    cursor: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Скроллбар */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--accent), #5d1c36);
+    border-radius: 10px;
+  }
+
+  /* ==========================================================================
+     ПРЕЛОАДЕР
+     ========================================================================== */
+  #preloader {
     position: fixed;
+    inset: 0;
+    background: var(--bg-dark);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s;
+  }
+  #preloader.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .loader-heart {
+    font-size: 50px;
+    color: var(--accent);
+    animation: loaderPulse 1.2s ease-in-out infinite;
+  }
+  @keyframes loaderPulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.3); opacity: 1; }
+  }
+  .loader-text {
+    margin-top: 20px;
+    font-size: 11px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ==========================================================================
+     КАСТОМНЫЙ КУРСОР
+     ========================================================================== */
+  .cursor-dot {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
     pointer-events: none;
     z-index: 9999;
-    transition: transform 0.1s ease;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, opacity 0.3s;
   }
-  .cursor-follower {
-    width: 36px; height: 36px;
-    border: 1px solid rgba(255, 143, 177, 0.4);
-    border-radius: 50%;
+  .cursor-ring {
     position: fixed;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--accent-glow);
+    border-radius: 50%;
     pointer-events: none;
     z-index: 9998;
-    transition: transform 0.3s ease, border-color 0.3s;
+    transform: translate(-50%, -50%);
+    transition: transform 0.4s var(--transition), border-color 0.3s, width 0.3s, height 0.3s;
+  }
+  .cursor-ring.hover {
+    width: 70px;
+    height: 70px;
+    border-color: var(--accent);
+    background: rgba(255, 143, 177, 0.05);
   }
 
-  /* --- ФОН --- */
-  .bg-container {
+  /* ==========================================================================
+     ФОНОВЫЕ СЛОИ И ЧАСТИЦЫ
+     ========================================================================== */
+  #bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+  }
+  .bg-orbs {
     position: fixed;
     inset: 0;
     z-index: -1;
+    pointer-events: none;
     overflow: hidden;
   }
-  .glow-orb {
+  .orb {
     position: absolute;
     border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.4;
-    animation: drift 20s infinite alternate;
+    filter: blur(120px);
+    opacity: 0.35;
+    animation: orbDrift 25s ease-in-out infinite alternate;
   }
-  .orb-1 { width: 500px; height: 500px; background: #5d1c36; top: -10%; left: -10%; }
-  .orb-2 { width: 600px; height: 600px; background: #2a1338; bottom: -20%; right: -10%; animation-delay: -5s; }
-  .orb-3 { width: 400px; height: 400px; background: #852e4c; top: 40%; left: 30%; opacity: 0.2; animation-delay: -10s; }
-
-  @keyframes drift {
+  .orb-1 {
+    width: 600px; height: 600px;
+    background: #5d1c36;
+    top: -15%; left: -10%;
+  }
+  .orb-2 {
+    width: 700px; height: 700px;
+    background: #2a1338;
+    bottom: -25%; right: -15%;
+    animation-delay: -8s;
+  }
+  .orb-3 {
+    width: 400px; height: 400px;
+    background: #852e4c;
+    top: 40%; left: 40%;
+    opacity: 0.15;
+    animation-delay: -15s;
+  }
+  @keyframes orbDrift {
     0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(50px, 80px) scale(1.2); }
+    100% { transform: translate(80px, 100px) scale(1.25); }
   }
 
-  /* Звезды */
-  .star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle 4s infinite; }
-  @keyframes twinkle { 0%,100% { opacity: 0.1; transform: scale(0.8); } 50% { opacity: 0.9; transform: scale(1.2); } }
+  /* ==========================================================================
+     НАВИГАЦИЯ
+     ========================================================================== */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 25px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    transition: all 0.5s var(--transition);
+    mix-blend-mode: difference;
+  }
+  .nav.scrolled {
+    padding: 15px 50px;
+    background: rgba(10, 7, 13, 0.8);
+    backdrop-filter: blur(15px);
+    mix-blend-mode: normal;
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-style: italic;
+    color: var(--text-main);
+    letter-spacing: 2px;
+  }
+  .nav-links {
+    display: flex;
+    gap: 40px;
+  }
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    position: relative;
+    transition: color 0.3s;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--accent);
+    transition: width 0.4s var(--transition);
+  }
+  .nav-links a:hover {
+    color: var(--accent);
+  }
+  .nav-links a:hover::after {
+    width: 100%;
+  }
 
-  /* --- СЕКЦИИ --- */
+  /* ==========================================================================
+     ОБЩИЕ КЛАССЫ ДЛЯ СЕКЦИЙ
+     ========================================================================== */
   section {
     min-height: 100vh;
+    padding: 100px 50px;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 60px 20px;
-    position: relative;
+    flex-direction: column;
   }
-
-  /* --- ГЛАВНЫЙ ЭКРАН (HERO) --- */
-  .hero { text-align: center; flex-direction: column; }
-  
-  .hero-sub {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 12px;
-    letter-spacing: 8px;
-    text-transform: uppercase;
-    color: #ff8fb1;
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 400;
+    text-align: center;
     margin-bottom: 20px;
-    opacity: 0;
-    animation: fadeUp 1s ease forwards 0.5s;
-  }
-
-  .hero-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(60px, 15vw, 120px);
-    font-weight: 600;
-    line-height: 1;
-    background: linear-gradient(135deg, #fff 0%, #ffc4d4 50%, #ff6b9d 100%);
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
     -webkit-background-clip: text;
     background-clip: text;
-    color: transparent;
+    -webkit-text-fill-color: transparent;
     opacity: 0;
-    animation: fadeUp 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.8s;
+    transform: translateY(30px);
+    transition: all 1s var(--transition);
   }
-
-  .hero-line {
-    width: 1px; height: 80px;
-    background: linear-gradient(180deg, #ff6b9d, transparent);
-    margin: 30px auto;
-    opacity: 0;
-    animation: fadeDown 1s ease forwards 1.5s;
-  }
-
-  .hero-hint {
-    font-family: 'Cormorant Garamond', serif;
+  .section-subtitle {
+    font-family: var(--font-serif);
     font-style: italic;
     font-size: 18px;
-    color: rgba(255, 196, 212, 0.7);
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 60px;
     opacity: 0;
-    animation: fadeUp 1s ease forwards 2s;
+    transform: translateY(30px);
+    transition: all 1s var(--transition) 0.2s;
   }
-
-  /* --- СЕКЦИЯ СО СТИХОМ --- */
-  .poem-section { flex-direction: column; text-align: center; }
-  
-  .poem-container {
-    max-width: 600px;
-    position: relative;
-    padding: 40px;
-  }
-
-  .quote-mark {
-    position: absolute;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 120px;
-    color: rgba(255, 143, 177, 0.1);
-    line-height: 1;
-    top: -20px; left: -10px;
-  }
-  .quote-mark.end { top: auto; bottom: -60px; right: -10px; left: auto; transform: rotate(180deg); }
-
-  .poem-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(20px, 4vw, 26px);
-    line-height: 2;
-    font-style: italic;
-    color: #f4e9ef;
-    text-shadow: 0 0 30px rgba(255, 143, 177, 0.2);
-  }
-
-  .poem-text span {
-    display: block;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  .poem-container.active .poem-text span {
+  .section-title.visible, .section-subtitle.visible {
     opacity: 1;
     transform: translateY(0);
   }
 
-  /* Задержки для строк стиха */
-  .poem-container.active .poem-text span:nth-child(1) { transition-delay: 0.1s; }
-  .poem-container.active .poem-text span:nth-child(2) { transition-delay: 0.3s; }
-  .poem-container.active .poem-text span:nth-child(3) { transition-delay: 0.5s; }
-  .poem-container.active .poem-text span:nth-child(4) { transition-delay: 0.7s; }
-  .poem-container.active .poem-text span:nth-child(5) { transition-delay: 0.9s; margin-top: 20px; }
-  .poem-container.active .poem-text span:nth-child(6) { transition-delay: 1.1s; }
-  .poem-container.active .poem-text span:nth-child(7) { transition-delay: 1.3s; }
-  .poem-container.active .poem-text span:nth-child(8) { transition-delay: 1.5s; }
-  .poem-container.active .poem-text span:nth-child(9) { transition-delay: 1.7s; margin-top: 20px; }
-  .poem-container.active .poem-text span:nth-child(10) { transition-delay: 1.9s; }
-  .poem-container.active .poem-text span:nth-child(11) { transition-delay: 2.1s; }
-  .poem-container.active .poem-text span:nth-child(12) { transition-delay: 2.3s; }
-
-  /* --- СЕКЦИЯ ФИНАЛА --- */
-  .outro { text-align: center; }
-  
-  .outro-card {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 196, 212, 0.15);
-    border-radius: 30px;
-    padding: 60px 40px;
-    max-width: 500px;
+  /* ==========================================================================
+     СЕКЦИЯ 1: ГЛАВНЫЙ ЭКРАН (HERO)
+     ========================================================================== */
+  #hero {
+    text-align: center;
+    min-height: 100vh;
+    padding-top: 150px;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+  }
+  .hero-pretitle {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 30px;
+    opacity: 0;
+    animation: fadeUp 1.2s var(--transition) forwards 0.5s;
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(80px, 20vw, 200px);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 0.9;
+    letter-spacing: -2px;
+    background: linear-gradient(180deg, #fff 20%, var(--accent) 60%, #5d1c36 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0;
+    animation: fadeUp 1.8s var(--transition) forwards 0.8s;
+    position: relative;
+  }
+  .hero-title::after {
+    content: 'Влада';
+    position: absolute;
+    inset: 0;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 143, 177, 0.15);
+    z-index: -1;
+    transform: translate(8px, 8px);
+  }
+  .hero-divider {
+    width: 1px;
+    height: 100px;
+    background: linear-gradient(180deg, var(--accent), transparent);
+    margin: 40px auto;
+    opacity: 0;
+    animation: fadeUp 1s var(--transition) forwards 1.6s;
+  }
+  .hero-subtitle {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(18px, 2.5vw, 24px);
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+    opacity: 0;
+    animation: fadeUp 1.2s var(--transition) forwards 2s;
+  }
+  .scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    opacity: 0;
+    animation: fadeUp 1s var(--transition) forwards 2.8s;
+  }
+  .scroll-indicator span {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(180deg, var(--accent), transparent);
     position: relative;
     overflow: hidden;
   }
-  
-  /* Блик при наведении */
-  .outro-card::before {
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 30%;
+    background: #fff;
+    animation: scrollDown 2s ease-in-out infinite;
+  }
+  @keyframes scrollDown {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(400%); }
+  }
+
+  /* ==========================================================================
+     СЕКЦИЯ 2: СТИХ
+     ========================================================================== */
+  #poem {
+    background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-deep) 100%);
+  }
+  .poem-wrapper {
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+    padding: 60px 40px;
+  }
+  .poem-quote {
+    position: absolute;
+    font-family: var(--font-display);
+    font-size: 200px;
+    line-height: 0.8;
+    color: rgba(255, 143, 177, 0.08);
+    top: 0;
+    left: -40px;
+    user-select: none;
+  }
+  .poem-quote.end {
+    top: auto;
+    bottom: -80px;
+    left: auto;
+    right: -40px;
+    transform: rotate(180deg);
+  }
+  .poem-line {
+    font-family: var(--font-serif);
+    font-size: clamp(20px, 3.5vw, 28px);
+    line-height: 1.9;
+    font-style: italic;
+    text-align: center;
+    color: var(--text-main);
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s var(--transition);
+    margin-bottom: 8px;
+  }
+  .poem-line.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .poem-line.stanza-break {
+    margin-top: 30px;
+  }
+  .poem-line.highlight {
+    color: var(--accent);
+    font-weight: 600;
+    text-shadow: 0 0 30px var(--accent-glow);
+  }
+
+  /* ==========================================================================
+     СЕКЦИЯ 3: ПРИЧИНЫ
+     ========================================================================== */
+  #reasons {
+    background: var(--bg-deep);
+  }
+  .reasons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1100px;
+    width: 100%;
+    margin-top: 40px;
+  }
+  .reason-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 143, 177, 0.1);
+    border-radius: 20px;
+    padding: 40px 30px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s var(--transition);
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  .reason-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reason-card::before {
     content: '';
     position: absolute;
     top: 0; left: -100%;
     width: 50%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
     transform: skewX(-20deg);
-    transition: 0.7s;
+    transition: 0.8s;
   }
-  .outro-card:hover::before { left: 150%; }
+  .reason-card:hover::before {
+    left: 150%;
+  }
+  .reason-card:hover {
+    border-color: rgba(255, 143, 177, 0.4);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 143, 177, 0.1);
+  }
+  .reason-number {
+    font-family: var(--font-display);
+    font-size: 60px;
+    font-style: italic;
+    color: rgba(255, 143, 177, 0.15);
+    line-height: 1;
+    margin-bottom: 15px;
+    transition: color 0.3s;
+  }
+  .reason-card:hover .reason-number {
+    color: var(--accent);
+  }
+  .reason-title {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-style: italic;
+    color: var(--text-main);
+    margin-bottom: 15px;
+  }
+  .reason-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
 
-  .heart-icon {
-    font-size: 40px;
-    color: #ff6b9d;
-    margin-bottom: 20px;
-    display: inline-block;
-    animation: heartbeat 1.5s infinite;
+  /* ==========================================================================
+     СЕКЦИЯ 4: ГАЛЕРЕЯ ЧУВСТВ (ПАРАЛЛАКС)
+     ========================================================================== */
+  #gallery {
+    background: var(--bg-dark);
+    overflow: hidden;
   }
-  @keyframes heartbeat {
-    0%, 100% { transform: scale(1); }
-    15% { transform: scale(1.3); }
-    30% { transform: scale(1); }
-    45% { transform: scale(1.2); }
+  .gallery-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 1000px;
+    width: 100%;
+    margin-top: 40px;
   }
-
-  .outro-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 24px;
-    line-height: 1.6;
-    margin-bottom: 30px;
-  }
-
-  .btn {
-    display: inline-block;
-    padding: 15px 40px;
-    border: 1px solid rgba(255, 143, 177, 0.5);
-    border-radius: 50px;
-    color: #ffc4d4;
-    text-decoration: none;
-    font-size: 13px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    transition: all 0.4s ease;
+  .gallery-item {
+    width: 200px;
+    height: 260px;
+    border-radius: 100px 100px 20px 20px;
+    background: linear-gradient(180deg, rgba(255, 143, 177, 0.1), rgba(93, 28, 54, 0.2));
+    border: 1px solid rgba(255, 143, 177, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
     position: relative;
     overflow: hidden;
-    background: transparent;
-    cursor: none;
+    transition: all 0.5s var(--transition);
+    opacity: 0;
+    transform: translateY(60px) scale(0.9);
   }
-  .btn:hover {
-    background: rgba(255, 143, 177, 0.1);
-    border-color: #ff8fb1;
-    box-shadow: 0 0 30px rgba(255, 107, 157, 0.3);
-    color: #fff;
+  .gallery-item.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  .gallery-item:nth-child(even) {
+    margin-top: 60px;
+  }
+  .gallery-item:hover {
+    transform: translateY(-10px) scale(1.05);
+    border-color: var(--accent);
+    box-shadow: 0 20px 60px rgba(255, 143, 177, 0.2);
+  }
+  .gallery-item::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
   }
 
-  /* --- АНИМАЦИИ ПОЯВЛЕНИЯ --- */
+  /* ==========================================================================
+     СЕКЦИЯ 5: ТАЙМЛАЙН
+     ========================================================================== */
+  #timeline {
+    background: var(--bg-deep);
+  }
+  .timeline-wrapper {
+    position: relative;
+    max-width: 800px;
+    width: 100%;
+    margin-top: 40px;
+  }
+  .timeline-wrapper::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, var(--accent-glow), transparent);
+    transform: translateX(-50%);
+  }
+  .timeline-item {
+    position: relative;
+    width: 50%;
+    padding: 20px 40px;
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: all 1s var(--transition);
+  }
+  .timeline-item.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .timeline-item:nth-child(even) {
+    margin-left: 50%;
+    padding-left: 60px;
+    transform: translateX(50px);
+  }
+  .timeline-item:nth-child(even).visible {
+    transform: translateX(0);
+  }
+  .timeline-item:nth-child(odd) {
+    text-align: right;
+    padding-right: 60px;
+  }
+  .timeline-dot {
+    position: absolute;
+    top: 30px;
+    width: 14px;
+    height: 14px;
+    background: var(--bg-dark);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    z-index: 2;
+    transition: all 0.3s;
+  }
+  .timeline-item:nth-child(odd) .timeline-dot {
+    right: -7px;
+  }
+  .timeline-item:nth-child(even) .timeline-dot {
+    left: -7px;
+  }
+  .timeline-item:hover .timeline-dot {
+    background: var(--accent);
+    box-shadow: 0 0 20px var(--accent);
+  }
+  .timeline-date {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .timeline-title {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+  .timeline-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  /* ==========================================================================
+     СЕКЦИЯ 6: ФИНАЛ
+     ========================================================================== */
+  #outro {
+    background: radial-gradient(circle at 50% 50%, var(--bg-deep), var(--bg-dark));
+    text-align: center;
+  }
+  .outro-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 143, 177, 0.2);
+    border-radius: 40px;
+    padding: 80px 60px;
+    max-width: 600px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 1.2s var(--transition);
+  }
+  .outro-card.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .outro-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(255, 143, 177, 0.15), transparent 60%);
+    pointer-events: none;
+  }
+  .outro-heart {
+    font-size: 70px;
+    color: var(--accent);
+    display: inline-block;
+    animation: heartBeat 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 30px var(--accent-glow));
+  }
+  @keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.25); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.15); }
+    60% { transform: scale(1); }
+  }
+  .outro-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 48px);
+    font-style: italic;
+    margin: 30px 0 20px;
+    background: linear-gradient(135deg, #fff, var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .outro-text {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-style: italic;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+  .outro-btn {
+    display: inline-block;
+    padding: 18px 50px;
+    border: 1px solid var(--accent-glow);
+    border-radius: 50px;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s var(--transition);
+    cursor: none;
+    background: transparent;
+  }
+  .outro-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: translateY(100%);
+    transition: transform 0.5s var(--transition);
+    z-index: -1;
+  }
+  .outro-btn:hover {
+    color: var(--bg-dark);
+    border-color: var(--accent);
+    box-shadow: 0 0 40px var(--accent-glow);
+  }
+  .outro-btn:hover::before {
+    transform: translateY(0);
+  }
+
+  /* ==========================================================================
+     АУДИОПЛЕЕР (ВИЗУАЛЬНЫЙ)
+     ========================================================================== */
+  .audio-player {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    background: rgba(10, 7, 13, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 143, 177, 0.2);
+    border-radius: 50px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.4s var(--transition);
+    cursor: none;
+  }
+  .audio-player:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 30px var(--accent-glow);
+  }
+  .audio-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    color: var(--bg-dark);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: none;
+    transition: transform 0.2s;
+  }
+  .audio-btn:hover {
+    transform: scale(1.1);
+  }
+  .audio-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .audio-title {
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--text-main);
+  }
+  .audio-artist {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+  .audio-visualizer {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 24px;
+  }
+  .audio-bar {
+    width: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    height: 20%;
+    transition: height 0.15s ease;
+  }
+  .audio-player.playing .audio-bar {
+    animation: audioPulse 0.8s ease-in-out infinite alternate;
+  }
+  .audio-bar:nth-child(1) { animation-delay: 0s; }
+  .audio-bar:nth-child(2) { animation-delay: 0.1s; }
+  .audio-bar:nth-child(3) { animation-delay: 0.2s; }
+  .audio-bar:nth-child(4) { animation-delay: 0.3s; }
+  @keyframes audioPulse {
+    0% { height: 20%; }
+    100% { height: 100%; }
+  }
+
+  /* ==========================================================================
+     FOOTER
+     ========================================================================== */
+  footer {
+    padding: 40px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 143, 177, 0.1);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  footer span {
+    color: var(--accent);
+  }
+
+  /* ==========================================================================
+     АНИМАЦИИ
+     ========================================================================== */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
 
-  /* --- АДАПТИВ --- */
-  @media (max-width: 768px) {
+  /* ==========================================================================
+     АДАПТИВНОСТЬ
+     ========================================================================== */
+  @media (max-width: 900px) {
     body { cursor: auto; }
-    .cursor, .cursor-follower { display: none; }
-    .btn { cursor: pointer; }
-    .poem-container { padding: 20px; }
-    .quote-mark { font-size: 80px; top: -10px; left: 0; }
-    .quote-mark.end { bottom: -40px; right: 0; }
+    .cursor-dot, .cursor-ring { display: none; }
+    .outro-btn, .audio-btn { cursor: pointer; }
+    .nav { padding: 20px 25px; }
+    .nav-links { gap: 20px; }
+    .nav-links a { font-size: 9px; }
+    section { padding: 80px 25px; }
+    .timeline-wrapper::before { left: 20px; }
+    .timeline-item { width: 100%; padding-left: 50px; padding-right: 0; text-align: left !important; }
+    .timeline-item:nth-child(even) { margin-left: 0; }
+    .timeline-item:nth-child(odd) .timeline-dot,
+    .timeline-item:nth-child(even) .timeline-dot { left: 14px; right: auto; }
+    .audio-player { bottom: 15px; right: 15px; padding: 10px 15px; }
+    .audio-info { display: none; }
   }
 </style>
 </head>
 <body>
 
-  <!-- Кастомный курсор -->
-  <div class="cursor"></div>
-  <div class="cursor-follower"></div>
-
-  <!-- Фон -->
-  <div class="bg-container">
-    <div class="glow-orb orb-1"></div>
-    <div class="glow-orb orb-2"></div>
-    <div class="glow-orb orb-3"></div>
+  <!-- ПРЕЛОАДЕР -->
+  <div id="preloader">
+    <div class="loader-heart">♥</div>
+    <div class="loader-text">Загрузка чувств...</div>
   </div>
 
-  <!-- Секция 1: Главный экран -->
-  <section class="hero">
-    <div class="hero-sub">Для той, что важнее всех</div>
-    <h1 class="hero-name">Влада</h1>
-    <div class="hero-line"></div>
-    <div class="hero-hint">листай вниз ↓</div>
-  </section>
+  <!-- КУРСОР -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
 
-  <!-- Секция 2: Стих -->
-  <section class="poem-section">
-    <div class="poem-container">
-      <div class="quote-mark">“</div>
-      <div class="poem-text">
-        <span>Ты — тихий свет в моей ночи,</span>
-        <span>Ты — вдох, что я ловлю украдкой.</span>
-        <span>Когда ты рядом — мир молчит,</span>
-        <span>И дышит нежность под лопаткой.</span>
-        
-        <span>В твоих глазах — закатный мёд,</span>
-        <span>В твоём дыхании — весна.</span>
-        <span>Влада... как сердце узнаёт</span>
-        <span>Своё созвездие без сна.</span>
-        
-        <span>Хочу с тобой простых вещей:</span>
-        <span>Рассвет, ладонь, дожди, дороги,</span>
-        <span>И быть счастливым — просто с ней,</span>
-        <span>Собирая в строчки эти слоги.</span>
-      </div>
-      <div class="quote-mark end">“</div>
+  <!-- ФОН -->
+  <canvas id="bg-canvas"></canvas>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- НАВИГАЦИЯ -->
+  <nav class="nav" id="nav">
+    <div class="nav-logo">Влада</div>
+    <div class="nav-links">
+      <a href="#hero">Начало</a>
+      <a href="#poem">Стих</a>
+      <a href="#reasons">Причины</a>
+      <a href="#timeline">Время</a>
+      <a href="#outro">Финал</a>
+    </div>
+  </nav>
+
+  <!-- СЕКЦИЯ 1: HERO -->
+  <section id="hero">
+    <div class="hero-content">
+      <div class="hero-pretitle">Для той, что важнее всех</div>
+      <h1 class="hero-title">Влада</h1>
+      <div class="hero-divider"></div>
+      <p class="hero-subtitle">
+        Ты — целая вселенная,<br>
+        в которой я хочу потеряться.
+      </p>
+    </div>
+    <div class="scroll-indicator">
+      <span>Листай</span>
+      <div class="scroll-line"></div>
     </div>
   </section>
 
-  <!-- Секция 3: Финал -->
-  <section class="outro">
+  <!-- СЕКЦИЯ 2: СТИХ -->
+  <section id="poem">
+    <h2 class="section-title">Тихое признание</h2>
+    <p class="section-subtitle">Слова, что живут внутри</p>
+    <div class="poem-wrapper">
+      <div class="poem-quote">“</div>
+      <div class="poem-line">Ты — тихий свет в моей ночи,</div>
+      <div class="poem-line">Ты — вдох, что я ловлю украдкой.</div>
+      <div class="poem-line">Когда ты рядом — мир молчит,</div>
+      <div class="poem-line">И дышит нежность под лопаткой.</div>
+      <div class="poem-line stanza-break">В твоих глазах — закатный мёд,</div>
+      <div class="poem-line">В твоём дыхании — весна.</div>
+      <div class="poem-line highlight">Влада... как сердце узнаёт</div>
+      <div class="poem-line">Своё созвездие без сна.</div>
+      <div class="poem-line stanza-break">Хочу с тобой простых вещей:</div>
+      <div class="poem-line">Рассвет, ладонь, дожди, дороги,</div>
+      <div class="poem-line">И быть счастливым — просто с ней,</div>
+      <div class="poem-line">Собирая в строчки эти слоги.</div>
+      <div class="poem-quote end">“</div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 3: ПРИЧИНЫ -->
+  <section id="reasons">
+    <h2 class="section-title">Причины</h2>
+    <p class="section-subtitle">Почему именно ты</p>
+    <div class="reasons-grid">
+      <div class="reason-card">
+        <div class="reason-number">01</div>
+        <div class="reason-title">Твой смех</div>
+        <div class="reason-text">Он звучит как мелодия, которую хочется слушать на повторе всю жизнь.</div>
+      </div>
+      <div class="reason-card">
+        <div class="reason-number">02</div>
+        <div class="reason-title">Твой взгляд</div>
+        <div class="reason-text">В нём можно утонуть, и я не хочу всплывать. Никогда.</div>
+      </div>
+      <div class="reason-card">
+        <div class="reason-number">03</div>
+        <div class="reason-title">Твоя доброта</div>
+        <div class="reason-text">Ты делаешь этот мир теплее, просто существуя в нём.</div>
+      </div>
+      <div class="reason-card">
+        <div class="reason-number">04</div>
+        <div class="reason-title">Твоя искренность</div>
+        <div class="reason-text">В тебе нет фальши. Ты настоящая, и это самое ценное.</div>
+      </div>
+      <div class="reason-card">
+        <div class="reason-number">05</div>
+        <div class="reason-title">Твоя сила</div>
+        <div class="reason-text">Ты сильная, но не боишься быть нежной. Это редкий дар.</div>
+      </div>
+      <div class="reason-card">
+        <div class="reason-number">06</div>
+        <div class="reason-title">Ты — это ты</div>
+        <div class="reason-text">Просто Влада. И этого достаточно, чтобы я был счастлив.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 4: ГАЛЕРЕЯ -->
+  <section id="gallery">
+    <h2 class="section-title">Чувства</h2>
+    <p class="section-subtitle">То, что ты во мне пробуждаешь</p>
+    <div class="gallery-wrapper">
+      <div class="gallery-item" data-label="Нежность">🌸</div>
+      <div class="gallery-item" data-label="Тепло">🔥</div>
+      <div class="gallery-item" data-label="Спокойствие">🌊</div>
+      <div class="gallery-item" data-label="Вдохновение">✨</div>
+      <div class="gallery-item" data-label="Любовь">💗</div>
+      <div class="gallery-item" data-label="Счастье">🌙</div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 5: ТАЙМЛАЙН -->
+  <section id="timeline">
+    <h2 class="section-title">Наша история</h2>
+    <p class="section-subtitle">Мгновения, что останутся со мной</p>
+    <div class="timeline-wrapper">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Первый взгляд</div>
+        <div class="timeline-title">Момент, когда всё началось</div>
+        <div class="timeline-text">Я ещё не знал, но сердце уже сделало выбор.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Первый разговор</div>
+        <div class="timeline-title">Слова, что изменили всё</div>
+        <div class="timeline-text">Твой голос стал моим любимым звуком.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Первый смех</div>
+        <div class="timeline-title">Мелодия, что звучит до сих пор</div>
+        <div class="timeline-text">Я понял, что хочу слышать его каждый день.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Сегодня</div>
+        <div class="timeline-title">Каждый день с тобой — подарок</div>
+        <div class="timeline-text">И я хочу, чтобы этих дней было бесконечно много.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 6: ФИНАЛ -->
+  <section id="outro">
     <div class="outro-card">
-      <div class="heart-icon">♥</div>
-      <div class="outro-text">
-        Ты — моё самое красивое<br>«навсегда».
-      </div>
-      <a href="#" class="btn" onclick="alert('Я тебя люблю ❤️'); return false;">Нажми меня</a>
+      <div class="outro-heart">♥</div>
+      <h2 class="outro-title">Навсегда</h2>
+      <p class="outro-text">
+        Ты — моё самое красивое «навсегда».<br>
+        Спасибо, что ты есть.
+      </p>
+      <a href="#" class="outro-btn" onclick="showLove(); return false;">Признание</a>
     </div>
   </section>
 
-  <script>
-    // --- 1. Кастомный курсор ---
-    const cursor = document.querySelector('.cursor');
-    const follower = document.querySelector('.cursor-follower');
-    
-    if (window.innerWidth > 768) {
-      document.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-        
-        // Плавное следование
-        follower.animate({
-          left: e.clientX + 'px',
-          top: e.clientY + 'px'
-        }, { duration: 500, fill: 'forwards' });
-      });
+  <footer>
+    Сделано с <span>♥</span> для Влады &copy; 2026
+  </footer>
 
-      // Эффект при наведении на кнопку
-      const btn = document.querySelector('.btn');
-      btn.addEventListener('mouseenter', () => {
-        follower.style.transform = 'translate(-50%, -50%) scale(1.5)';
-        follower.style.borderColor = 'rgba(255, 143, 177, 0.8)';
-        cursor.style.transform = 'scale(0.5)';
-      });
-      btn.addEventListener('mouseleave', () => {
-        follower.style.transform = 'translate(-50%, -50%) scale(1)';
-        follower.style.borderColor = 'rgba(255, 143, 177, 0.4)';
-        cursor.style.transform = 'scale(1)';
-      });
+  <!-- АУДИОПЛЕЕР -->
+  <div class="audio-player" id="audioPlayer">
+    <button class="audio-btn" id="audioBtn">▶</button>
+    <div class="audio-info">
+      <div class="audio-title">Heartbeat</div>
+      <div class="audio-artist">for Vlada</div>
+    </div>
+    <div class="audio-visualizer">
+      <div class="audio-bar"></div>
+      <div class="audio-bar"></div>
+      <div class="audio-bar"></div>
+      <div class="audio-bar"></div>
+    </div>
+  </div>
+
+<script>
+  /* ==========================================================================
+     1. ПРЕЛОАДЕР
+     ========================================================================== */
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('preloader').classList.add('hidden');
+    }, 1500);
+  });
+
+  /* ==========================================================================
+     2. КАСТОМНЫЙ КУРСОР
+     ========================================================================== */
+  const cursorDot = document.querySelector('.cursor-dot');
+  const cursorRing = document.querySelector('.cursor-ring');
+  let mouseX = 0, mouseY = 0;
+  let ringX = 0, ringY = 0;
+
+  if (window.innerWidth > 900) {
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursorDot.style.left = mouseX + 'px';
+      cursorDot.style.top = mouseY + 'px';
+    });
+
+    // Плавное следование кольца
+    function animateRing() {
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+      cursorRing.style.left = ringX + 'px';
+      cursorRing.style.top = ringY + 'px';
+      requestAnimationFrame(animateRing);
     }
+    animateRing();
 
-    // --- 2. Генерация звезд ---
-    const bg = document.querySelector('.bg-container');
-    for (let i = 0; i < 80; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-      const size = Math.random() * 2 + 1;
-      star.style.width = size + 'px';
-      star.style.height = size + 'px';
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
-      star.style.animationDelay = Math.random() * 5 + 's';
-      star.style.animationDuration = (3 + Math.random() * 4) + 's';
-      bg.appendChild(star);
+    // Эффект наведения на интерактивные элементы
+    const hoverables = document.querySelectorAll('a, button, .reason-card, .gallery-item, .timeline-item');
+    hoverables.forEach(el => {
+      el.addEventListener('mouseenter', () => cursorRing.classList.add('hover'));
+      el.addEventListener('mouseleave', () => cursorRing.classList.remove('hover'));
+    });
+  }
+
+  /* ==========================================================================
+     3. НАВИГАЦИЯ (ПРИ СКРОЛЛЕ)
+     ========================================================================== */
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
     }
+  });
 
-    // --- 3. Анимация появления текста при скролле (Intersection Observer) ---
-    const observerOptions = {
-      threshold: 0.3 // Срабатывает, когда 30% блока видно
-    };
+  /* ==========================================================================
+     4. АНИМАЦИИ ПОЯВЛЕНИЯ (INTERSECTION OBSERVER)
+     ========================================================================== */
+  const observerOptions = {
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px'
+  };
 
-    const observer = new IntersectionObserver((entries) => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, observerOptions);
+
+  // Заголовки секций
+  document.querySelectorAll('.section-title, .section-subtitle').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Строки стиха с задержкой
+  const poemLines = document.querySelectorAll('.poem-line');
+  const poemObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, index * 150);
+      }
+    });
+  }, { threshold: 0.2 });
+  poemLines.forEach(line => poemObserver.observe(line));
+
+  // Карточки причин
+  document.querySelectorAll('.reason-card').forEach((card, index) => {
+    const cardObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-          // Если хотим, чтобы анимация срабатывала только 1 раз:
-          // observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 100);
         }
       });
-    }, observerOptions);
+    }, { threshold: 0.2 });
+    cardObserver.observe(card);
+  });
 
-    const poemContainer = document.querySelector('.poem-container');
-    observer.observe(poemContainer);
-  </script>
+  // Галерея
+  document.querySelectorAll('.gallery-item').forEach((item, index) => {
+    const itemObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 100);
+        }
+      });
+    }, { threshold: 0.2 });
+    itemObserver.observe(item);
+  });
+
+  // Таймлайн
+  document.querySelectorAll('.timeline-item').forEach((item, index) => {
+    const itemObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 150);
+        }
+      });
+    }, { threshold: 0.3 });
+    itemObserver.observe(item);
+  });
+
+  // Карточка финала
+  const outroCard = document.querySelector('.outro-card');
+  if (outroCard) {
+    const outroObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.3 });
+    outroObserver.observe(outroCard);
+  }
+
+  /* ==========================================================================
+     5. CANVAS: ЗВЁЗДЫ И ЧАСТИЦЫ
+     ========================================================================== */
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  let width, height;
+
+  function resizeCanvas() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+    initStars();
+  }
+
+  function initStars() {
+    stars = [];
+    const count = Math.floor((width * height) / 8000);
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.5 + 0.3,
+        alpha: Math.random() * 0.7 + 0.1,
+        speed: Math.random() * 0.3 + 0.05,
+        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        twinklePhase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  function drawStars() {
+    ctx.clearRect(0, 0, width, height);
+    stars.forEach(star => {
+      star.twinklePhase += star.twinkleSpeed;
+      const twinkle = Math.sin(star.twinklePhase) * 0.4 + 0.6;
+      const alpha = star.alpha * twinkle;
+      
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 220, 235, ${alpha})`;
+      ctx.fill();
+
+      // Свечение для крупных звёзд
+      if (star.radius > 1.2) {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius * 3, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 143, 177, ${alpha * 0.1})`;
+        ctx.fill();
+      }
+
+      // Медленное движение вниз
+      star.y += star.speed;
+      if (star.y > height) {
+        star.y = 0;
+        star.x = Math.random() * width;
+      }
+    });
+    requestAnimationFrame(drawStars);
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+  drawStars();
+
+  /* ==========================================================================
+     6. ПАДАЮЩИЕ СЕРДЦА
+     ========================================================================== */
+  const heartSymbols = ['♥', '❤', '♡', '❥', '💗'];
+  
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+    heart.style.position = 'fixed';
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.top = '-50px';
+    heart.style.fontSize = (12 + Math.random() * 20) + 'px';
+    heart.style.color = `rgba(255, 143, 177, ${0.2 + Math.random() * 0.3})`;
+    heart.style.pointerEvents = 'none';
+    heart.style.zIndex = '1';
+    heart.style.transition = 'transform 8s linear, opacity 8s linear';
+    
+    document.body.appendChild(heart);
+    
+    requestAnimationFrame(() => {
+      heart.style.transform = `translateY(110vh) rotate(${Math.random() * 360}deg)`;
+      heart.style.opacity = '0';
+    });
+    
+    setTimeout(() => heart.remove(), 8500);
+  }
+
+  setInterval(createHeart, 1200);
+
+  /* ==========================================================================
+     7. АУДИОПЛЕЕР (ВИЗУАЛЬНЫЙ)
+     ========================================================================== */
+  const audioBtn = document.getElementById('audioBtn');
+  const audioPlayer = document.getElementById('audioPlayer');
+  let isPlaying = false;
+
+  // Используем Web Audio API для генерации звука (сердцебиение)
+  let audioContext;
+  let oscillator;
+  let gainNode;
+  let heartbeatInterval;
+
+  function createHeartbeatSound() {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    // Создаём узел усиления
+    gainNode = audioContext.createGain();
+    gainNode.gain.value = 0.08;
+    gainNode.connect(audioContext.destination);
+    
+    // Функция для создания одного удара
+    function beat() {
+      if (!isPlaying) return;
+      
+      // Первый удар (систола)
+      const osc1 = audioContext.createOscillator();
+      const env1 = audioContext.createGain();
+      osc1.frequency.value = 60;
+      osc1.type = 'sine';
+      env1.gain.setValueAtTime(0, audioContext.currentTime);
+      env1.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.02);
+      env1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+      osc1.connect(env1);
+      env1.connect(gainNode);
+      osc1.start();
+      osc1.stop(audioContext.currentTime + 0.2);
+      
+      // Второй удар (диастола) - через 200мс
+      setTimeout(() => {
+        if (!isPlaying) return;
+        const osc2 = audioContext.createOscillator();
+        const env2 = audioContext.createGain();
+        osc2.frequency.value = 50;
+        osc2.type = 'sine';
+        env2.gain.setValueAtTime(0, audioContext.currentTime);
+        env2.gain.linearRampToValueAtTime(0.8, audioContext.currentTime + 0.02);
+        env2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.18);
+        osc2.connect(env2);
+        env2.connect(gainNode);
+        osc2.start();
+        osc2.stop(audioContext.currentTime + 0.25);
+      }, 200);
+    }
+    
+    // Запускаем сердцебиение каждые 1.2 секунды
+    beat();
+    heartbeatInterval = setInterval(beat, 1200);
+  }
+
+  audioBtn.addEventListener('click', () => {
+    isPlaying = !isPlaying;
+    
+    if (isPlaying) {
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+      createHeartbeatSound();
+      audioPlayer.classList.add('playing');
+      audioBtn.textContent = '⏸';
+    } else {
+      clearInterval(heartbeatInterval);
+      if (gainNode) {
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+      }
+      audioPlayer.classList.remove('playing');
+      audioBtn.textContent = '▶';
+    }
+  });
+
+  /* ==========================================================================
+     8. ФУНКЦИЯ ПРИЗНАНИЯ
+     ========================================================================== */
+  function showLove() {
+    // Создаём взрыв из сердец
+    for (let i = 0; i < 30; i++) {
+      setTimeout(() => {
+        const heart = document.createElement('div');
+        heart.textContent = '♥';
+        heart.style.position = 'fixed';
+        heart.style.left = '50%';
+        heart.style.top = '50%';
+        heart.style.fontSize = (20 + Math.random() * 40) + 'px';
+        heart.style.color = '#ff8fb1';
+        heart.style.pointerEvents = 'none';
+        heart.style.zIndex = '9999';
+        heart.style.textShadow = '0 0 20px #ff8fb1';
+        
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 200 + Math.random() * 400;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance;
+        
+        document.body.appendChild(heart);
+        
+        requestAnimationFrame(() => {
+          heart.style.transition = 'transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1.5s';
+          heart.style.transform = `translate(${tx}px, ${ty}px) scale(0)`;
+          heart.style.opacity = '0';
+        });
+        
+        setTimeout(() => heart.remove(), 1600);
+      }, i * 30);
+    }
+    
+    // Показываем сообщение
+    setTimeout(() => {
+      alert('Я тебя люблю, Влада ❤️\n\nТы — самое дорогое, что у меня есть.');
+    }, 500);
+  }
+
+  /* ==========================================================================
+     9. ПЛАВНАЯ ПРОКРУТКА ДЛЯ ССЫЛОК
+     ========================================================================== */
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  /* ==========================================================================
+     10. ПАРАЛЛАКС ЭФФЕКТ ДЛЯ ФОНОВЫХ ОРБОВ
+     ========================================================================== */
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+        document.querySelectorAll('.orb').forEach((orb, index) => {
+          const speed = 0.05 + index * 0.03;
+          orb.style.transform = `translateY(${scrollY * speed}px)`;
+        });
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+
+  /* ==========================================================================
+     11. ЭФФЕКТ НАКЛОНА КАРТОЧЕК (3D TILT)
+     ========================================================================== */
+  document.querySelectorAll('.reason-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = (y - centerY) / 20;
+      const rotateY = (centerX - x) / 20;
+      
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+    });
+  });
+
+  /* ==========================================================================
+     12. ЗАЩИТА ОТ КОПИРОВАНИЯ (ОПЦИОНАЛЬНО)
+     ========================================================================== */
+  // Раскомментируйте, если хотите запретить копирование
+  // document.addEventListener('copy', (e) => {
+  //   e.preventDefault();
+  //   alert('Этот текст только для глаз, не для копирования 😉');
+  // });
+</script>
 </body>
-</html>
+        </html>
