@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Влада ♥</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(circle at 50% 120%, #ff5e7e 0%, #b3245c 35%, #4b0f3a 65%, #12040f 100%);
+    font-family: 'Georgia', serif; overflow:hidden; position:relative;
+  }
+  .sun {
+    position:absolute; top:12%; width:340px; height:340px; border-radius:50%;
+    background: radial-gradient(circle, #ffd27a, #ff8a5b 40%, transparent 70%);
+    filter: blur(30px); opacity:.55; animation: breathe 7s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.15);opacity:.8} }
+
+  .card {
+    position:relative; z-index:2; max-width:600px; margin:24px; padding:56px 44px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02));
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border:1px solid rgba(255,190,200,0.28); border-radius:28px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.15);
+    text-align:center; animation: rise 1.6s cubic-bezier(.2,.7,.2,1);
+  }
+  @keyframes rise { from{opacity:0; transform:translateY(50px) scale(.97)} to{opacity:1; transform:none} }
+
+  .orn { color:#ffb3c1; letter-spacing:14px; font-size:14px; opacity:.8; }
+  .name {
+    font-size:52px; letter-spacing:10px; text-transform:uppercase; margin:14px 0 6px;
+    background: linear-gradient(90deg,#fff0f3,#ffb3c1,#ff6b8b,#ffb3c1,#fff0f3);
+    background-size:300% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation: shine 8s linear infinite;
+  }
+  @keyframes shine { to{ background-position:300% center; } }
+  .sub { font-size:13px; letter-spacing:6px; text-transform:uppercase; color:rgba(255,190,200,.65); margin-bottom:36px; }
+
+  .poem { font-size:19px; line-height:2.05; color:#ffeaf0; font-style:italic; white-space:pre-line; }
+  .poem::first-letter { font-size:34px; }
+
+  .sig { margin-top:38px; display:flex; align-items:center; justify-content:center; gap:12px; color:rgba(255,180,195,.75); font-size:14px; letter-spacing:3px; }
+  .sig .line { width:40px; height:1px; background:linear-gradient(90deg,transparent,#ff6b8b); }
+  .sig .line.r { background:linear-gradient(90deg,#ff6b8b,transparent); }
+  .beat { color:#ff6b8b; animation: beat 1.3s ease-in-out infinite; }
+  @keyframes beat { 0%,100%{transform:scale(1)} 25%{transform:scale(1.35)} 50%{transform:scale(1)} }
+
+  .petal { position:fixed; top:-40px; color:rgba(255,170,190,.35); animation: fall linear infinite; pointer-events:none; }
+  @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+</style>
+</head>
+<body>
+  <div class="sun"></div>
+  <div class="card">
+    <div class="orn">✦ ✦ ✦</div>
+    <div class="name">Влада</div>
+    <div class="sub">моей вселенной свет</div>
+    <div class="poem">Ты — тихий свет в моей ночи,
+Ты — вдох, что я ловлю украдкой.
+Когда ты рядом — мир молчит,
+И дышит нежность под лопаткой.
+
+В твоих глазах — закатный мёд,
+В твоём дыхании — весна.
+Влада... как сердце узнаёт
+Своё созвездие без сна.
+
+Хочу с тобой простых вещей:
+Рассвет, ладонь, дожди, дороги,
+И быть счастливым — просто с ней,
+Собирая в строчки эти слоги.</div>
+    <div class="sig"><span class="line"></span><span class="beat">♥</span> твой навсегда <span class="beat">♥</span><span class="line r"></span></div>
+  </div>
+<script>
+  const s=['♥','❥','✿','♡','✦'];
+  setInterval(()=>{
+    const p=document.createElement('div'); p.className='petal';
+    p.textContent=s[Math.floor(Math.random()*s.length)];
+    p.style.left=Math.random()*100+'vw';
+    p.style.fontSize=(12+Math.random()*22)+'px';
+    p.style.animationDuration=(8+Math.random()*8)+'s';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),17000);
+  },600);
+</script>
+</body>
+</html>
